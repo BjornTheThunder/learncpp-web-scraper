@@ -35,21 +35,21 @@ In alignment with the requirements specified by the site owner:
 * `pip` (Python package manager)
 * use pip to install requests and beautifulsoup4
 
-** On Windows open PowerShell and execute: **
-\```shell
+#### On Windows open PowerShell and execute:
+```shell
 pip install pip beautifulsoup4
-\```
+```
 
-** On Linux execute: **
+#### On Linux execute:
 1. On Debian:
-\```bash
+```bash
 sudo apt update && sudo apt upgrade
 sudo apt install python-requests python-bs4
-\```
+```
 2. On Arch
-\```bash
+```bash
 sudo pacman -Syyu python-requests python-beautifulsoup4
-\```
+```
 
 ### Installation
 1. Clone the repository:
