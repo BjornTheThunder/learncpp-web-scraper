@@ -48,7 +48,7 @@ sudo apt install python-requests python-bs4
 ```
 2. On Arch
 ```bash
-sudo pacman -Syyu python-requests python-beautifulsoup4
+sudo pacman -Sy python-requests python-beautifulsoup4
 ```
 
 ### Installation
