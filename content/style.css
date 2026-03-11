@@ -1,5 +1,18 @@
-/* Import Roboto */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono&display=swap');
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/roboto-v51-latin-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/roboto-mono-v22-latin-regular.woff2') format('woff2');
+}
 
 :root {
     /* Light Mode Palette */
@@ -26,8 +39,9 @@
     
     --btn-text: #ffffff;
 
-    --link-color: #1a73e8;
-    --link-hover: #1557b0;
+    --link-color: #0056b3;
+    --link-hover: #003d80;
+    --link-visited: #663399;
 }
 
 /* Automatic Dark Mode Support & Manual Override */
@@ -73,8 +87,15 @@
     --solution-border: #81c784;
     --solution-text: #c8e6c9;
     --btn-text: #121212;
-    --link-color: #8ab4f8;
-    --link-hover: #aecbfa;
+    --link-color: #82b1ff;
+    --link-hover: #b3d1ff;
+    --link-visited: #c3a0e9;
+}
+
+html {
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
 }
 
 body {
@@ -88,16 +109,6 @@ body {
     flex-direction: column;
     align-items: center;
     transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.entry-content {
-    background: var(--surface);
-    max-width: 850px;
-    width: 100%;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: var(--shadow);
-    box-sizing: border-box;
 }
 
 h1, h2, h3 {
@@ -285,6 +296,33 @@ code:not(pre code) {
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
+/* Target links only within the lesson text */
+.entry-content a:not(.local-lesson-nav a) {
+    color: var(--link-color);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s ease;
+    text-underline-offset: 3px;
+}
+
+.entry-content a:not(.local-lesson-nav a):visited {
+    color: var(--link-visited);
+}
+
+.entry-content a:not(.local-lesson-nav a):hover {
+    color: var(--link-hover);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    background-color: rgba(130, 177, 255, 0.1); /* Very subtle highlight */
+    border-radius: 2px;
+}
+
+/* Specific fix for links inside C++ notes to ensure contrast */
+.cpp-note a {
+    font-weight: 500;
+    text-decoration: underline !important;
+}
+
 figure {
     margin: 0;
     max-width: 100%;
@@ -354,9 +392,11 @@ code a {
 }
 
 .sidebar a.active {
-    background: var(--primary);
-    color: white !important;
-    font-weight: 500;
+    background: rgba(25, 118, 210, 0.1);
+    color: var(--primary) !important;
+    font-weight: 600;
+    border-left: 4px solid var(--primary);
+    padding-left: 4px; 
 }
 
 /* Adjust Content Container */
@@ -370,4 +410,25 @@ code a {
 @media (max-width: 900px) {
     .sidebar { display: none; }
     .main-wrapper { display: block; }
+}
+
+/* Custom Scrollbar for Sidebar and Body */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--divider);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+::selection {
+    background-color: var(--primary);
+    color: var(--btn-text);
 }
