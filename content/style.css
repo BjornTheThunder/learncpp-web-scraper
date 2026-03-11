@@ -67,6 +67,10 @@
         --solution-text: #c8e6c9;
         
         --btn-text: #121212;
+
+    --link-color: #82b1ff;
+    --link-hover: #b3d1ff;
+    --link-visited: #c3a0e9;
     }
 }
 

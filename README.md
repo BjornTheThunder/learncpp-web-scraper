@@ -37,18 +37,18 @@ In alignment with the requirements specified by the site owner:
 
 #### On Windows open PowerShell and execute:
 ```shell
-pip install requests beautifulsoup4
+pip install requests beautifulsoup4 pywebview
 ```
 
 #### On Linux execute:
 1. On Debian:
 ```bash
 sudo apt update && sudo apt upgrade
-sudo apt install python-requests python-bs4
+sudo apt install python-requests python-bs4 python3-gi gir1.2-gtk-3.0 gir1.2-webkit2-4.1
 ```
 2. On Arch
 ```bash
-sudo pacman -Sy python-requests python-beautifulsoup4
+sudo pacman -Sy python-requests python-beautifulsoup4 python-pywebview webkit2gtk-4.1 python-gobject
 ```
 
 ### Installation
@@ -56,7 +56,11 @@ sudo pacman -Sy python-requests python-beautifulsoup4
    ```bash
    git clone https://github.com/BjornTheThunder/learncpp-web-scraper
    cd learncpp-scraper
-2. Execute the program:
+2. Run the scraper:
 ```bash
-   python main.py
+   python scraper.py
+```
+3. Execute the main program:
+```bash
+   python app.py
 ```

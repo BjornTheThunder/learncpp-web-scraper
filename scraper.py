@@ -179,16 +179,33 @@ def wrap_and_nav(lesson, idx, total, all_lessons):
     <link href="prism.css" rel="stylesheet" />
     <script>
         (function() {{
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
+            const savedTheme = localStorage.getItem('theme');
+            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            const initialTheme = savedTheme || (systemDark ? 'dark' : 'light');
+            
+            document.documentElement.setAttribute('data-theme', initialTheme);
         }})();
 
         function toggleTheme() {{
             const current = document.documentElement.getAttribute('data-theme');
-            const target = current === 'dark' ? 'light' : 'dark';
+            const target = (current === 'dark') ? 'light' : 'dark';
+            
             document.documentElement.setAttribute('data-theme', target);
-            localStorage.setItem('theme', target);
+            
+            // Save to localStorage (this works across localhost:8080)
+            try {{
+                localStorage.setItem('theme', target);
+            }} catch (e) {{
+                console.error("Storage failed: ", e);
+            }}
         }}
+
+        window.addEventListener('storage', (e) => {{
+            if (e.key === 'theme') {{
+                document.documentElement.setAttribute('data-theme', e.newValue);
+            }}
+        }});
 
         function cppSolutionToggle(e,l,s,h){{e.style.display=(e.style.display==='none'||e.style.display==='')?'block':'none';l.innerHTML=(e.style.display==='none')?s:h;}}
         function cppHintToggle(e,l,s,h){{cppSolutionToggle(e,l,s,h);}}
