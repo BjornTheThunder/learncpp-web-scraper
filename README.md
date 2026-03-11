@@ -16,7 +16,7 @@ In alignment with the requirements specified by the site owner:
 
 ### Project Status
 > [!NOTE]
-> This project is currently in its **pre-release and testing phase** 
+> This project is currently still in **development and testing phase** 
 
 ---
 

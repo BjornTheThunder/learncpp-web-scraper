@@ -3,16 +3,18 @@ from bs4 import BeautifulSoup
 import time
 import os
 import concurrent.futures
+import json
 from urllib.parse import urljoin, urlparse, urlunparse, quote_plus
 
 # --- Configuration ---
 START_URL = "https://www.learncpp.com/cpp-tutorial/introduction-to-these-tutorials/"
 BASE_URL = "https://www.learncpp.com"
-MAX_LESSONS = 30
+MAX_LESSONS = 10
 STOP_TITLE = "C.1 — The end?"
 OUTPUT_FOLDER = "content"
 IMG_FOLDER = os.path.join(OUTPUT_FOLDER, "img")
 CSS_FILENAME = "style.css"
+CHECKPOINT_FILE = os.path.join(OUTPUT_FOLDER, "checkpoint.json")
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -215,24 +217,58 @@ def wrap_and_nav(lesson, idx, total, all_lessons):
 def run_scraper():
     if not os.path.exists(OUTPUT_FOLDER):
         os.makedirs(OUTPUT_FOLDER)
+
     current_url = START_URL
     all_lessons = []
+
+    # --- PHASE 0: Load Checkpoint ---
+    if os.path.exists(CHECKPOINT_FILE):
+        try:
+            with open(CHECKPOINT_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                all_lessons = data.get("lessons", [])
+                current_url = data.get("next_url", START_URL)
+                print(
+                    f"Checkpoint found! Loaded {len(all_lessons)} completely scraped lessons."
+                )
+                print(f"Resuming scrape at: {current_url}\n")
+        except Exception as e:
+            print(f"Error loading checkpoint: {e}. Starting fresh.")
 
     # --- PHASE 1: Scrape all pages into memory ---
     while current_url and len(all_lessons) < MAX_LESSONS:
         print(f"Scraping [{len(all_lessons) + 1}]: {current_url}")
+
+        # If the script crashes inside scrape_lesson, the checkpoint remains untouched.
+        # Next time it runs, it will load the exact same current_url.
         lesson_data, next_url = scrape_lesson(current_url)
+
         if lesson_data:
             all_lessons.append(lesson_data)
+
+            # --- PHASE 1.5: Save Checkpoint ---
+            with open(CHECKPOINT_FILE, "w", encoding="utf-8") as f:
+                json.dump(
+                    {
+                        "next_url": next_url,  # Save the URL for the NEXT lesson
+                        "lessons": all_lessons,  # Save the completed lessons list
+                    },
+                    f,
+                    ensure_ascii=False,
+                    indent=2,
+                )
+
             if lesson_data["title"].strip() == STOP_TITLE:
+                print(f"Target reached: {STOP_TITLE}. Stopping crawl.")
                 break
+
             current_url = next_url
             time.sleep(1.5)
         else:
+            print("Stopping: No lesson data returned or End of course reached.")
             break
 
     print(f"\nProcessing internal links for {len(all_lessons)} lessons...")
-
     # --- PHASE 2a: Map original URLs to local filenames ---
     url_to_local_map = {}
     for i, lesson in enumerate(all_lessons):
