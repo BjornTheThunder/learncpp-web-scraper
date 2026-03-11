@@ -60,7 +60,4 @@ sudo pacman -Sy python-requests python-beautifulsoup4 python-pywebview webkit2gt
 ```bash
    python scraper.py
 ```
-3. Execute the main program:
-```bash
-   python app.py
-```
+3. Open index.html downloaded inside content folder
