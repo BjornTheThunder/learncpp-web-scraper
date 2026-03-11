@@ -16,7 +16,8 @@ In alignment with the requirements specified by the site owner:
 
 ### Project Status
 > [!NOTE]
-> This project is currently still in **development and testing phase** 
+> This project is currently still in **development and testing phase**
+> I tried to implement a GUI for "easier" access but it is not working as expected, so for now just download the content and open the index.html file
 
 ---
 

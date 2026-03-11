@@ -9,7 +9,7 @@ from urllib.parse import urljoin, urlparse, urlunparse, quote_plus
 # --- Configuration ---
 START_URL = "https://www.learncpp.com/cpp-tutorial/introduction-to-these-tutorials/"
 BASE_URL = "https://www.learncpp.com"
-MAX_LESSONS = 10
+MAX_LESSONS = 500
 STOP_TITLE = "C.1 — The end?"
 OUTPUT_FOLDER = "content"
 IMG_FOLDER = os.path.join(OUTPUT_FOLDER, "img")
