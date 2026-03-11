@@ -2,12 +2,13 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import os
+import concurrent.futures
 from urllib.parse import urljoin, urlparse, urlunparse, quote_plus
 
 # --- Configuration ---
 START_URL = "https://www.learncpp.com/cpp-tutorial/introduction-to-these-tutorials/"
 BASE_URL = "https://www.learncpp.com"
-MAX_LESSONS = 10
+MAX_LESSONS = 30
 STOP_TITLE = "C.1 — The end?"
 OUTPUT_FOLDER = "content"
 IMG_FOLDER = os.path.join(OUTPUT_FOLDER, "img")
@@ -16,6 +17,20 @@ CSS_FILENAME = "style.css"
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 }
+
+
+def download_single_image(img_url, local_path):
+    """Worker function to download a single image."""
+    if os.path.exists(local_path):
+        return  # Skip if we already downloaded it
+
+    try:
+        img_data = requests.get(img_url, headers=HEADERS, timeout=10).content
+        with open(local_path, "wb") as f:
+            f.write(img_data)
+            print(f"    ↳ Downloaded: {os.path.basename(local_path)}")
+    except Exception as e:
+        print(f"    ↳ Error downloading {img_url}: {e}")
 
 
 def normalize_url(url):
@@ -35,9 +50,12 @@ def normalize_url(url):
 
 
 def download_local_images(content_div):
-    """Finds all images, downloads them to /img, and updates the HTML to point locally."""
+    """Finds all images, updates HTML, and downloads them in parallel."""
     if not os.path.exists(IMG_FOLDER):
         os.makedirs(IMG_FOLDER)
+
+    download_tasks = []
+    fallback_counter = 0
 
     for img in content_div.find_all("img"):
         original_src = img.get("data-src") or img.get("src")
@@ -48,25 +66,31 @@ def download_local_images(content_div):
         parsed_url = urlparse(full_img_url)
         img_filename = os.path.basename(parsed_url.path)
 
+        # Fallback if URL has no clear filename
         if not img_filename:
-            img_filename = f"img_{int(time.time())}.png"
+            fallback_counter += 1
+            img_filename = f"img_{int(time.time())}_{fallback_counter}.png"
 
         local_path = os.path.join(IMG_FOLDER, img_filename)
 
-        if not os.path.exists(local_path):
-            try:
-                img_data = requests.get(
-                    full_img_url, headers=HEADERS, timeout=10
-                ).content
-                with open(local_path, "wb") as f:
-                    f.write(img_data)
-            except Exception as e:
-                print(f"    ↳ Error downloading image: {e}")
-                continue
+        # 1. Queue it up for the parallel downloader
+        download_tasks.append((full_img_url, local_path))
 
+        # 2. Instantly update the HTML DOM
         img["src"] = f"img/{img_filename}"
         if img.has_attr("data-src"):
             del img["data-src"]
+
+    # 3. Execute all downloads in parallel using 5 worker threads
+    if download_tasks:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+            # Submit all tasks to the executor
+            futures = [
+                executor.submit(download_single_image, url, path)
+                for url, path in download_tasks
+            ]
+            # Wait for all downloads in this lesson to finish before moving on
+            concurrent.futures.wait(futures)
 
 
 def scrape_lesson(url):
